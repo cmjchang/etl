@@ -1,0 +1,64 @@
+name: Production CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # ==========================================
+  # STAGE 1: BUILD & TEST (The Gatekeeper)
+  # ==========================================
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run Linters and Tests
+        run: |
+          echo "Running unit tests, linters, and security scans..."
+          # Example: pytest, npm test, etc.
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-artifact
+          path: .
+          retention-days: 1
+
+  # ==========================================
+  # STAGE 2: PRODUCTION DEPLOYMENT
+  # ==========================================
+  deploy-production:
+    name: Deploy to Production
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    
+    # This links the job to GitHub Environments. 
+    # In GitHub repo settings, you can configure "Required reviewers" 
+    # for the 'production' environment so it pauses for manual approval.
+    environment:
+      name: production
+      url: https://api.yourproductiondomain.com
+
+    steps:
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: production-artifact
+
+      - name: Deploy to Production
+        env:
+          # Securely injects secrets stored in GitHub Repository/Environment Secrets
+          DATABASE_SECRET: ${{ secrets.PRODUCTION_DATABASE_SECRET }}
+        run: |
+          echo "Deploying application to production..."
+          echo "Using secure connection string..."
+          # Add your deployment script or cloud CLI commands here (e.g., AWS, Azure, GCP)
+
+      - name: Run Post-Deployment Smoke Test
+        run: |
+          echo "Checking health endpoint of newly deployed service..."
+          # curl -f https://api.yourproductiondomain.com/health
