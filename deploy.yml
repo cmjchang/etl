@@ -1,4 +1,4 @@
-name: Production CI/CD Pipeline
+name: dbt Production CI/CD Pipeline
 
 on:
   push:
@@ -7,58 +7,93 @@ on:
 
 jobs:
   # ==========================================
-  # STAGE 1: BUILD & TEST (The Gatekeeper)
+  # STAGE 1: DBT BUILD & TEST (The Gatekeeper)
   # ==========================================
-  build-and-test:
-    name: Build and Test
+  dbt-ci-checks:
+    name: dbt Parse and Dev Build
     runs-on: ubuntu-latest
+
+    # Setup Python environment for dbt
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Run Linters and Tests
-        run: |
-          echo "Running unit tests, linters, and security scans..."
-          # Example: pytest, npm test, etc.
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
 
-      - name: Upload Build Artifact
+      - name: Install Dependencies
+        run: |
+          pip install --upgrade pip
+          pip install dbt-snowflake # Replace with your adapter: dbt-bigquery, dbt-postgres, dbt-databricks, etc.
+
+      # 1. dbt parse: Checks for syntax errors and schema/config correctness
+      - name: Run dbt parse
+        run: |
+          dbt parse --profiles-dir .
+        env:
+          DBT_ENV_SECRET_PASSPHRASE: ${{ secrets.DBT_ENV_SECRET_PASSPHRASE }} # Optional if using encrypted profiles
+
+      # 2. dbt build in Dev/CI environment: Compiles, runs, and tests models against a dev database/schema
+      - name: Run dbt build (Dev Environment)
+        run: |
+          dbt build --target dev --profiles-dir .
+        env:
+          # Inject your Development/CI database credentials from GitHub Secrets
+          DBT_HOST: ${{ secrets.DEV_DB_HOST }}
+          DBT_USER: ${{ secrets.DEV_DB_USER }}
+          DBT_PASSWORD: ${{ secrets.DEV_DB_PASSWORD }}
+          DBT_SCHEMA: ci_test_schema_${{ github.run_id }} # Isolated schema per build
+
+      - name: Upload dbt Manifest Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: production-artifact
-          path: .
-          retention-days: 1
+          name: dbt-artifacts
+          path: |
+            target/manifest.json
+            target/run_results.json
+          retention-days: 7
 
   # ==========================================
   # STAGE 2: PRODUCTION DEPLOYMENT
   # ==========================================
-  deploy-production:
+  dbt-production-deploy:
     name: Deploy to Production
-    needs: build-and-test
+    needs: dbt-ci-checks
     runs-on: ubuntu-latest
     
-    # This links the job to GitHub Environments. 
-    # In GitHub repo settings, you can configure "Required reviewers" 
-    # for the 'production' environment so it pauses for manual approval.
+    # Enforces manual approval gate if configured in GitHub Environments settings
     environment:
       name: production
-      url: https://api.yourproductiondomain.com
 
     steps:
-      - name: Download Build Artifact
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          pip install dbt-snowflake # Match your data warehouse adapter
+
+      - name: Download dbt Artifacts (Optional verification)
         uses: actions/download-artifact@v4
         with:
-          name: production-artifact
+          name: dbt-artifacts
+          path: target
 
-      - name: Deploy to Production
+      # Run dbt build or run/test against Production warehouse
+      - name: Run dbt build (Production Environment)
+        run: |
+          dbt build --target prod --profiles-dir .
         env:
-          # Securely injects secrets stored in GitHub Repository/Environment Secrets
-          DATABASE_SECRET: ${{ secrets.PRODUCTION_DATABASE_SECRET }}
-        run: |
-          echo "Deploying application to production..."
-          echo "Using secure connection string..."
-          # Add your deployment script or cloud CLI commands here (e.g., AWS, Azure, GCP)
-
-      - name: Run Post-Deployment Smoke Test
-        run: |
-          echo "Checking health endpoint of newly deployed service..."
-          # curl -f https://api.yourproductiondomain.com/health
+          # Inject your Production database credentials scoped to the production environment
+          DBT_HOST: ${{ secrets.PROD_DB_HOST }}
+          DBT_USER: ${{ secrets.PROD_DB_USER }}
+          DBT_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
+          DBT_SCHEMA: ${{ secrets.PROD_DB_SCHEMA }}
