@@ -1,0 +1,100 @@
+name: dbt Production CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # ==========================================
+  # STAGE 1: DBT BUILD & TEST (The Gatekeeper)
+  # ==========================================
+  dbt-ci-checks:
+    name: dbt Parse and Dev Build
+    runs-on: ubuntu-latest
+
+    # Setup Python environment for dbt
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          pip install --upgrade pip
+          pip install dbt-snowflake # Replace with your adapter: dbt-bigquery, dbt-postgres, dbt-databricks, etc.
+
+      # 1. dbt parse: Checks for syntax errors and schema/config correctness
+      - name: Run dbt parse
+        run: |
+          dbt parse --profiles-dir .
+        env:
+          DBT_ENV_SECRET_PASSPHRASE: ${{ secrets.DBT_ENV_SECRET_PASSPHRASE }} # Optional if using encrypted profiles
+
+      # 2. dbt build in Dev/CI environment: Compiles, runs, and tests models against a dev database/schema
+      - name: Run dbt build (Dev Environment)
+        run: |
+          dbt build --target dev --profiles-dir .
+        env:
+          # Inject your Development/CI database credentials from GitHub Secrets
+          DBT_HOST: ${{ secrets.DEV_DB_HOST }}
+          DBT_USER: ${{ secrets.DEV_DB_USER }}
+          DBT_PASSWORD: ${{ secrets.DEV_DB_PASSWORD }}
+          DBT_SCHEMA: ci_test_schema_${{ github.run_id }} # Isolated schema per build
+
+      - name: Upload dbt Manifest Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dbt-artifacts
+          path: |
+            target/manifest.json
+            target/run_results.json
+          retention-days: 7
+
+  # ==========================================
+  # STAGE 2: PRODUCTION DEPLOYMENT
+  # ==========================================
+  dbt-production-deploy:
+    name: Deploy to Production
+    needs: dbt-ci-checks
+    runs-on: ubuntu-latest
+    
+    # Enforces manual approval gate if configured in GitHub Environments settings
+    environment:
+      name: production
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          pip install dbt-snowflake # Match your data warehouse adapter
+
+      - name: Download dbt Artifacts (Optional verification)
+        uses: actions/download-artifact@v4
+        with:
+          name: dbt-artifacts
+          path: target
+
+      # Run dbt build or run/test against Production warehouse
+      - name: Run dbt build (Production Environment)
+        run: |
+          dbt build --target prod --profiles-dir .
+        env:
+          # Inject your Production database credentials scoped to the production environment
+          DBT_HOST: ${{ secrets.PROD_DB_HOST }}
+          DBT_USER: ${{ secrets.PROD_DB_USER }}
+          DBT_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
+          DBT_SCHEMA: ${{ secrets.PROD_DB_SCHEMA }}
+          
