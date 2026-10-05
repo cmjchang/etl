@@ -1,0 +1,1 @@
+(select * from {{ ref('annual_model_rankings') }} where registration_rank=1 except all select * from {{ ref('annual_best_models') }}) union all (select * from {{ ref('annual_best_models') }} except all select * from {{ ref('annual_model_rankings') }} where registration_rank=1)

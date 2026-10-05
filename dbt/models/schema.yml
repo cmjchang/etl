@@ -1,0 +1,49 @@
+version: 2
+models:
+  - name: veh0160_raw
+    description: Static source CSV, preserved as strings with load metadata.
+  - name: veh0160_columns
+    description: Value-preserving snake_case aliases, including registrations_YYYY_qN quarter columns.
+  - name: vehicle_registrations
+    description: Null-preserving vehicle-quarter records with parsed counts and source statuses.
+    columns:
+      - name: vehicle_key
+        data_tests: [not_null]
+      - name: quarter_key
+        data_tests: [not_null]
+      - name: count_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [reported, confidential, unavailable, not_applicable, missing]
+  - name: dim_vehicle
+    description: One row per cleaned vehicle category, keyed by a JSON-encoded tuple hash.
+    columns:
+      - name: vehicle_key
+        data_tests: [unique, not_null]
+  - name: dim_quarter
+    description: Source quarter coverage and calendar attributes.
+    columns:
+      - name: quarter_key
+        data_tests: [unique, not_null]
+  - name: fct_vehicle_registrations
+    description: First-registration counts at vehicle category and quarter grain.
+    columns:
+      - name: vehicle_key
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_vehicle')
+                field: vehicle_key
+      - name: quarter_key
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_quarter')
+                field: quarter_key
+  - name: annual_model_registrations
+    description: Generic-model totals over available quarters, with explicit coverage and unresolved-count flags.
+  - name: annual_model_rankings
+    description: Generic-model ranking within year/body type for configured years; partial years included.
+  - name: annual_best_models
+    description: Rank-1 generic models, including ties, over each year's available quarters.

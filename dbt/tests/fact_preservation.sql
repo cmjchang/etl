@@ -1,0 +1,1 @@
+select 1 where (select count(*) from {{ ref('vehicle_registrations') }}) <> (select count(*) from {{ ref('fct_vehicle_registrations') }}) or (select sum(registration_count) from {{ ref('vehicle_registrations') }}) is distinct from (select sum(registration_count) from {{ ref('fct_vehicle_registrations') }})

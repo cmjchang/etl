@@ -1,0 +1,1 @@
+with s as (select year, body_type, sum(registration_count) n from {{ ref('vehicle_registrations') }} group by all), a as (select year, body_type, sum(known_registration_count) n from {{ ref('annual_model_registrations') }} group by all) select s.year, s.body_type from s full join a using(year,body_type) where coalesce(s.n,0) <> coalesce(a.n,0)

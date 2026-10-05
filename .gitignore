@@ -1,0 +1,4 @@
+.venv/
+exports/
+my_database.duckdb
+my_database.duckdb.wal

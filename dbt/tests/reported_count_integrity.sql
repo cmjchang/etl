@@ -1,0 +1,1 @@
+select * from {{ ref('vehicle_registrations') }} where (count_status = 'reported' and (registration_count is null or registration_count < 0)) or (count_status <> 'reported' and registration_count is not null)
