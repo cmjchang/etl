@@ -7,21 +7,24 @@ test-paths: [tests]
 macro-paths: [macros]
 clean-targets: [target, dbt_packages]
 vars:
-  source_csv_path: '../duckdb/output/df_VEH0160_UK.csv'
+  source_csv_path: 'data/df_VEH0160_UK.csv'
   export_dir: '../exports/manual'
   ranking_years: [2024, 2025, 2026]
 models:
   vehicle_analytics:
     +materialized: table
-    src:
-      +schema: src
-    cln:
-      +schema: cln
-    int:
-      +schema: int
-    drv:
-      +schema: drv
+    ingestion:
+      +schema: raw
+    staging:
+      +schema: staging
+    intermediate:
+      +schema: intermediate
+    marts:
+      core:
+        +schema: core
+      reporting:
+        +schema: reporting
     export:
       +schema: vehicle_export
-      +materialized: drv_file
+      +materialized: export_file
       +tags: [export]

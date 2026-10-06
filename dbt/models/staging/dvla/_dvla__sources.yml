@@ -1,0 +1,10 @@
+version: 2
+sources:
+  - name: dvla
+    description: Fixed local UK first-registration snapshot, loaded by this project's ingestion model.
+    database: '{{ target.database }}'
+    schema: raw
+    tables:
+      - name: vehicle_registrations
+        identifier: raw_dvla__vehicle_registrations
+        description: Original CSV column names and string values, plus source/load metadata.

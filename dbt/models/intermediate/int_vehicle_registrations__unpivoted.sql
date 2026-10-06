@@ -1,5 +1,5 @@
 with unpivoted as (
-  select * from {{ ref('veh0160_columns') }}
+  select * from {{ ref('stg_dvla__vehicle_registrations') }}
   unpivot include nulls (raw_count for quarter_column in (columns('^registrations_[0-9]{4}_q[1-4]$')))
 ) , long as (
   select * exclude (quarter_column),

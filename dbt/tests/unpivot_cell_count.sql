@@ -1,1 +1,1 @@
-select 1 where (select count(*) from {{ ref('vehicle_registrations') }}) <> (select count(*) from {{ ref('veh0160_raw') }}) * (select count(*) from {{ ref('dim_quarter') }})
+select 1 where (select count(*) from {{ ref('int_vehicle_registrations__unpivoted') }}) <> (select count(*) from {{ ref('raw_dvla__vehicle_registrations') }}) * (select count(*) from {{ ref('dim_quarter') }})

@@ -1,6 +1,6 @@
 {% macro validate_source() %}
 {% if execute %}
-  {% set columns = adapter.get_columns_in_relation(ref('veh0160_raw')) %}
+  {% set columns = adapter.get_columns_in_relation(ref('raw_dvla__vehicle_registrations')) %}
   {% set required = ['BodyType', 'Make', 'GenModel', 'Model', 'Fuel', 'source_file', 'loaded_at'] %}
   {% set names = columns | map(attribute='name') | list %}
   {% for name in required %}

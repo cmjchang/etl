@@ -8,7 +8,9 @@ Whenever general dbt or SQL logic changes, update these Markdown files in the sa
 
 Keep root README links and summary consistent with those documents.
 
-Use the layer convention `src -> cln -> int -> drv`: source ingestion;
-snake_case aliases and cleaned records; canonical facts/dimensions;
-derived analytics from those facts/dimensions. Keep export dependencies and
-validators aligned with the current layer names.
+Use conventional dbt layers: sources/raw -> staging -> intermediate -> marts.
+Staging models use stg_<source>__<entity>; intermediate models use int_ prefixes.
+Final facts and dimensions live in marts/core with fct_ and dim_ prefixes.
+Reporting models live in marts/reporting with rpt_ prefixes. Export models use
+export_<report>__<format>. Keep model references, schemas, export validators,
+and documentation consistent when renaming.

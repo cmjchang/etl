@@ -1,8 +1,8 @@
--- depends_on: {{ ref('veh0160_raw') }}
+-- depends_on: {{ ref('raw_dvla__vehicle_registrations') }}
 {{ validate_source() }}
 {% set ns = namespace(quarters=[]) %}
 {% if execute %}
-  {% for col in adapter.get_columns_in_relation(ref('veh0160_raw')) %}
+  {% for col in adapter.get_columns_in_relation(source('dvla', 'vehicle_registrations')) %}
     {% if modules.re.fullmatch('[0-9]{4} Q[1-4]', col.name) %}
       {% do ns.quarters.append(col.name) %}
     {% endif %}
@@ -19,4 +19,4 @@ select
   {% endfor %}
   source_file,
   loaded_at
-from {{ ref('veh0160_raw') }}
+from {{ source('dvla', 'vehicle_registrations') }}

@@ -37,9 +37,9 @@ def validate_exports(db, batch):
     result = {}
     with duckdb.connect(str(db), read_only=True) as con:
         for name in NAMES:
-            relation = 'drv.' + name
+            relation = 'reporting.rpt_' + name
             columns = con.sql('describe ' + relation).fetchall()
-            # JSON and CSV readers infer types; normalize to the exact drv schema.
+            # JSON and CSV readers infer types; normalize to the exact reporting schema.
             for fmt in ['csv', 'json', 'parquet']:
                 path = batch / (name + '.' + fmt)
                 if fmt == 'json':

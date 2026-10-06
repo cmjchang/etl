@@ -1,10 +1,10 @@
 version: 2
 models:
-  - name: veh0160_raw
+  - name: raw_dvla__vehicle_registrations
     description: Static source CSV, preserved as strings with load metadata.
-  - name: veh0160_columns
+  - name: stg_dvla__vehicle_registrations
     description: Value-preserving snake_case aliases, including registrations_YYYY_qN quarter columns.
-  - name: vehicle_registrations
+  - name: int_vehicle_registrations__unpivoted
     description: Null-preserving vehicle-quarter records with parsed counts and source statuses.
     columns:
       - name: vehicle_key
@@ -41,9 +41,9 @@ models:
               arguments:
                 to: ref('dim_quarter')
                 field: quarter_key
-  - name: annual_model_registrations
+  - name: rpt_annual_model_registrations
     description: Generic-model totals over available quarters, with explicit coverage and unresolved-count flags.
-  - name: annual_model_rankings
+  - name: rpt_annual_model_rankings
     description: Generic-model ranking within year/body type for configured years; partial years included.
-  - name: annual_best_models
+  - name: rpt_annual_best_models
     description: Rank-1 generic models, including ties, over each year's available quarters.
