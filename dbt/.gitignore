@@ -5,5 +5,3 @@ data/
 __pycache__/
 dbt_internal_packages/
 .user.yml
-exports/
-uv.lock

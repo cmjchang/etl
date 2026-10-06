@@ -2,3 +2,4 @@
 exports/
 my_database.duckdb
 my_database.duckdb.wal
+uv.lock

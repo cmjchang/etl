@@ -7,8 +7,7 @@ test-paths: [tests]
 macro-paths: [macros]
 clean-targets: [target, dbt_packages]
 vars:
-  source_csv_path: 'data/df_VEH0160_UK.csv'
-  export_dir: '../exports/manual'
+  export_dir: '../exports/'
   ranking_years: [2024, 2025, 2026]
 models:
   vehicle_analytics:
