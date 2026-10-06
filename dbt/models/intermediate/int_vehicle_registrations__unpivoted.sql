@@ -1,12 +1,17 @@
-with unpivoted as (
+with 
+unpivoted as (
   select * from {{ ref('stg_dvla__vehicle_registrations') }}
   unpivot include nulls (raw_count for quarter_column in (columns('^registrations_[0-9]{4}_q[1-4]$')))
-) , long as (
+) , 
+
+long as (
   select * exclude (quarter_column),
     regexp_extract(quarter_column, '([0-9]{4})_q([1-4])', 1)
       || ' Q' || regexp_extract(quarter_column, '([0-9]{4})_q([1-4])', 2) as period_label
   from unpivoted
-), cleaned as (
+), 
+
+cleaned as (
   select
     coalesce(nullif(trim(body_type), ''), 'UNKNOWN') as body_type,
     coalesce(nullif(trim(make), ''), 'UNKNOWN') as make,
@@ -26,7 +31,9 @@ with unpivoted as (
       else 'invalid'
     end as count_status
   from long
-), typed as (
+), 
+
+typed as (
   select *,
     make_date(year, (quarter_number - 1) * 3 + 1, 1) as quarter_start_date,
     case when count_status = 'reported' then cast(trim(raw_count) as bigint) end as registration_count,
@@ -35,6 +42,7 @@ with unpivoted as (
     upper(model) in ('UNKNOWN', 'MODEL MISSING') as is_unknown_model
   from cleaned
 )
+
 select *,
   md5(to_json(list_value(body_type, make, generic_model, model, fuel_type))) as vehicle_key,
   year * 10 + quarter_number as quarter_key

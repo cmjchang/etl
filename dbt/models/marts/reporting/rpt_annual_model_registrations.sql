@@ -1,4 +1,5 @@
-with annual as (
+with 
+annual as (
   select q.year, v.body_type, v.make, v.generic_model,
     coalesce(sum(f.registration_count), 0)::bigint as known_registration_count,
     count(*) filter (where f.count_status <> 'reported') as unresolved_cell_count,
@@ -10,7 +11,8 @@ with annual as (
   join {{ ref('dim_vehicle') }} v using (vehicle_key)
   join {{ ref('dim_quarter') }} q using (quarter_key)
   group by q.year, v.body_type, v.make, v.generic_model
-), labeled as (
+), 
+labeled as (
   select *,
     case when unresolved_cell_count = 0 then known_registration_count end as annual_registration_count,
     quarters_available = 4 as is_full_year,
@@ -21,6 +23,7 @@ with annual as (
       over (partition by year, body_type) as comparison_unresolved_cells
   from annual
 )
+
 select *,
   not is_unknown_identity and comparison_unresolved_cells = 0 as is_rank_eligible,
   case when is_unknown_identity then 'unknown_identity'
