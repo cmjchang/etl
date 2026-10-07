@@ -11,8 +11,9 @@ annual as (
   join {{ ref('dim_vehicle') }} v using (vehicle_key)
   join {{ ref('dim_quarter') }} q using (quarter_key)
   group by q.year, v.body_type, v.make, v.generic_model
-), 
-labeled as (
+)
+
+, labeled as (
   select *,
     case when unresolved_cell_count = 0 then known_registration_count end as annual_registration_count,
     quarters_available = 4 as is_full_year,
