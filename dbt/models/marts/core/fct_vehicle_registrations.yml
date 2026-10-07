@@ -1,0 +1,41 @@
+version: 2
+models:
+- name: fct_vehicle_registrations
+  description: First-registration counts at vehicle category and quarter grain.
+  columns:
+  - name: vehicle_key
+    data_tests:
+    - not_null
+    - relationships:
+        arguments:
+          to: ref('dim_vehicle')
+          field: vehicle_key
+  - name: quarter_key
+    data_tests:
+    - not_null
+    - relationships:
+        arguments:
+          to: ref('dim_quarter')
+          field: quarter_key
+  - name: count_status
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - reported
+          - confidential
+          - unavailable
+          - not_applicable
+          - missing
+          quote: true
+  config:
+    tags:
+    - dvla
+    - marts
+  data_tests:
+  - dvla_nonempty
+  - dvla_expression_is_true:
+      arguments:
+        expression: (count_status = 'reported' and registration_count is not null and registration_count >= 0) or (count_status
+          <> 'reported' and registration_count is null)

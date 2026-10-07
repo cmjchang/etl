@@ -1,0 +1,116 @@
+version: 2
+models:
+- name: export_annual_model_rankings__csv
+  config:
+    tags:
+    - dvla
+    - export
+  description: CSV export view matching rpt_annual_model_rankings, including tied ranks.
+  columns:
+  - name: year
+    data_tests:
+    - not_null
+  - name: body_type
+    data_tests:
+    - not_null
+  - name: make
+    data_tests:
+    - not_null
+  - name: generic_model
+    data_tests:
+    - not_null
+  - name: known_registration_count
+    data_tests:
+    - not_null
+  - name: unresolved_cell_count
+    data_tests:
+    - not_null
+  - name: is_full_year
+    data_tests:
+    - not_null
+  - name: has_complete_counts
+    data_tests:
+    - not_null
+  - name: is_unknown_identity
+    data_tests:
+    - not_null
+  - name: comparison_unresolved_cells
+    data_tests:
+    - not_null
+  - name: is_rank_eligible
+    data_tests:
+    - not_null
+  - name: quarters_available
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - 1
+          - 2
+          - 3
+          - 4
+          quote: false
+  - name: first_available_quarter
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - 1
+          - 2
+          - 3
+          - 4
+          quote: false
+  - name: last_available_quarter
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - 1
+          - 2
+          - 3
+          - 4
+          quote: false
+  - name: coverage_label
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - full_year
+          - year_to_date
+          - partial_year
+          quote: true
+  - name: ranking_status
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - unknown_identity
+          - incomplete_counts
+          - eligible
+          quote: true
+  - name: annual_registration_count
+    data_tests:
+    - not_null
+  - name: registration_rank
+    data_tests:
+    - not_null
+  data_tests:
+  - dvla_unique_columns:
+      arguments:
+        column_names:
+        - year
+        - body_type
+        - make
+        - generic_model
+  - dvla_expression_is_true:
+      arguments:
+        expression: is_rank_eligible and ranking_status = 'eligible' and annual_registration_count >= 0 and registration_rank
+          >= 1
+  - dvla_same_rows:
+      arguments:
+        compare_model: ref('rpt_annual_model_rankings')

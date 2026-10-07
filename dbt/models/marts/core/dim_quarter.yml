@@ -1,0 +1,75 @@
+version: 2
+models:
+- name: dim_quarter
+  description: Source quarter coverage and calendar attributes.
+  columns:
+  - name: quarter_key
+    data_tests:
+    - not_null
+    - unique
+  - name: period_label
+    data_tests:
+    - not_null
+  - name: year
+    data_tests:
+    - not_null
+  - name: quarter_start_date
+    data_tests:
+    - not_null
+  - name: quarter_end_date
+    data_tests:
+    - not_null
+  - name: quarter_number
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - 1
+          - 2
+          - 3
+          - 4
+          quote: false
+  - name: quarters_available
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - 1
+          - 2
+          - 3
+          - 4
+          quote: false
+  - name: first_available_quarter
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - 1
+          - 2
+          - 3
+          - 4
+          quote: false
+  - name: last_available_quarter
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - 1
+          - 2
+          - 3
+          - 4
+          quote: false
+  config:
+    tags:
+    - dvla
+    - marts
+  data_tests:
+  - dvla_nonempty
+  - dvla_expression_is_true:
+      arguments:
+        expression: quarter_end_date >= quarter_start_date and first_available_quarter <= quarter_number and quarter_number
+          <= last_available_quarter

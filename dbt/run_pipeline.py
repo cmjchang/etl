@@ -24,7 +24,7 @@ def main():
     batch.mkdir(parents=True)
     variables = json.dumps({'export_dir': batch.as_posix()})
     subprocess.run([str(dbt), 'build', '--profiles-dir', '.', '--select', 'tag:export', '--vars', variables], check=True)
-    db = Path(os.environ.get('VEHICLE_DB_PATH', '../my_database.duckdb')).resolve()
+    db = Path(os.environ.get('../my_database.duckdb')).resolve()
     result = validate_exports(db, batch)
     manifest = {'database': str(db), 'batch': str(batch), 'validated_files': result}
     (batch / '_SUCCESS.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8')

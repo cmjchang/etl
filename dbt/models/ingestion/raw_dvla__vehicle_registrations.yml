@@ -1,0 +1,15 @@
+version: 2
+models:
+- name: raw_dvla__vehicle_registrations
+  description: DVLA remote CSV preserved as strings with source and load metadata.
+  config:
+    tags:
+    - dvla
+    - ingestion
+  columns:
+  - name: source_file
+    data_tests:
+    - not_null
+  - name: loaded_at
+    data_tests:
+    - not_null

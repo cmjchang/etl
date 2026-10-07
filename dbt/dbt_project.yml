@@ -8,7 +8,6 @@ macro-paths: [macros]
 clean-targets: [target, dbt_packages]
 vars:
   export_dir: '../exports/'
-  ranking_years: [2024, 2025, 2026]
 models:
   vehicle_analytics:
     +materialized: table

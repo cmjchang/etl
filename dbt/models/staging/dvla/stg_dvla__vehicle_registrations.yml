@@ -1,0 +1,17 @@
+version: 2
+models:
+- name: stg_dvla__vehicle_registrations
+  description: Value-preserving snake_case aliases, including registrations_YYYY_qN quarter columns.
+  config:
+    tags:
+    - dvla
+    - staging
+  columns:
+  - name: source_file
+    data_tests:
+    - not_null
+  - name: loaded_at
+    data_tests:
+    - not_null
+  data_tests:
+  - dvla_nonempty

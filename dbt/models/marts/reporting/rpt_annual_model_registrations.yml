@@ -1,0 +1,108 @@
+version: 2
+models:
+- name: rpt_annual_model_registrations
+  description: Generic-model totals over available quarters, with explicit coverage and unresolved-count flags.
+  config:
+    tags:
+    - dvla
+    - marts
+  columns:
+  - name: year
+    data_tests:
+    - not_null
+  - name: body_type
+    data_tests:
+    - not_null
+  - name: make
+    data_tests:
+    - not_null
+  - name: generic_model
+    data_tests:
+    - not_null
+  - name: known_registration_count
+    data_tests:
+    - not_null
+  - name: unresolved_cell_count
+    data_tests:
+    - not_null
+  - name: is_full_year
+    data_tests:
+    - not_null
+  - name: has_complete_counts
+    data_tests:
+    - not_null
+  - name: is_unknown_identity
+    data_tests:
+    - not_null
+  - name: comparison_unresolved_cells
+    data_tests:
+    - not_null
+  - name: is_rank_eligible
+    data_tests:
+    - not_null
+  - name: quarters_available
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - 1
+          - 2
+          - 3
+          - 4
+          quote: false
+  - name: first_available_quarter
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - 1
+          - 2
+          - 3
+          - 4
+          quote: false
+  - name: last_available_quarter
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - 1
+          - 2
+          - 3
+          - 4
+          quote: false
+  - name: coverage_label
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - full_year
+          - year_to_date
+          - partial_year
+          quote: true
+  - name: ranking_status
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - unknown_identity
+          - incomplete_counts
+          - eligible
+          quote: true
+  data_tests:
+  - dvla_nonempty
+  - dvla_expression_is_true:
+      arguments:
+        expression: known_registration_count >= 0 and unresolved_cell_count >= 0 and comparison_unresolved_cells >= 0
+  - dvla_expression_is_true:
+      arguments:
+        expression: (unresolved_cell_count = 0 and annual_registration_count = known_registration_count) or (unresolved_cell_count
+          > 0 and annual_registration_count is null)
+  - dvla_expression_is_true:
+      arguments:
+        expression: has_complete_counts = (unresolved_cell_count = 0) and is_full_year = (quarters_available = 4) and is_rank_eligible
+          = (not is_unknown_identity and comparison_unresolved_cells = 0)

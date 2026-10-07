@@ -1,0 +1,79 @@
+version: 2
+models:
+- name: int_vehicle_registrations__unpivoted
+  description: Null-preserving vehicle-quarter records with parsed counts and source statuses.
+  columns:
+  - name: vehicle_key
+    data_tests:
+    - not_null
+  - name: quarter_key
+    data_tests:
+    - not_null
+  - name: body_type
+    data_tests:
+    - not_null
+  - name: make
+    data_tests:
+    - not_null
+  - name: generic_model
+    data_tests:
+    - not_null
+  - name: model
+    data_tests:
+    - not_null
+  - name: fuel_type
+    data_tests:
+    - not_null
+  - name: year
+    data_tests:
+    - not_null
+  - name: period_label
+    data_tests:
+    - not_null
+  - name: quarter_start_date
+    data_tests:
+    - not_null
+  - name: source_file
+    data_tests:
+    - not_null
+  - name: loaded_at
+    data_tests:
+    - not_null
+  - name: quarter_number
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - 1
+          - 2
+          - 3
+          - 4
+          quote: false
+  - name: count_status
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values:
+          - reported
+          - confidential
+          - unavailable
+          - not_applicable
+          - missing
+          quote: true
+  - name: is_unknown_make
+    data_tests:
+    - not_null
+  - name: is_unknown_generic_model
+    data_tests:
+    - not_null
+  - name: is_unknown_model
+    data_tests:
+    - not_null
+  config:
+    tags:
+    - dvla
+    - intermediate
+  data_tests:
+  - dvla_nonempty

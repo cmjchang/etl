@@ -1,0 +1,39 @@
+version: 2
+models:
+- name: dim_vehicle
+  description: One row per cleaned vehicle category, keyed by a JSON-encoded tuple hash.
+  columns:
+  - name: vehicle_key
+    data_tests:
+    - not_null
+    - unique
+  - name: body_type
+    data_tests:
+    - not_null
+  - name: make
+    data_tests:
+    - not_null
+  - name: generic_model
+    data_tests:
+    - not_null
+  - name: model
+    data_tests:
+    - not_null
+  - name: fuel_type
+    data_tests:
+    - not_null
+  - name: is_unknown_make
+    data_tests:
+    - not_null
+  - name: is_unknown_generic_model
+    data_tests:
+    - not_null
+  - name: is_unknown_model
+    data_tests:
+    - not_null
+  config:
+    tags:
+    - dvla
+    - marts
+  data_tests:
+  - dvla_nonempty

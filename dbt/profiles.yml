@@ -4,5 +4,5 @@ vehicle_analytics:
     local:
       type: duckdb
       path: '{{ env_var("VEHICLE_DB_PATH", "../my_database.duckdb") }}'
-      schema: main
-      threads: 1
+      threads: 8
+
