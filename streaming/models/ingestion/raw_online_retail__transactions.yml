@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: raw_online_retail__transactions
+    description: Raw Online Retail CSV loaded by DuckDB directly from a URL or local CSV, with all source values preserved as strings.
+    columns:
+      - name: source_row
+        description: Original scan row number, retained for deterministic tie ordering.
+        data_tests:
+          - not_null
+          - unique
+      - name: source_file
+        data_tests:
+          - not_null
+      - name: loaded_at
+        data_tests:
+          - not_null

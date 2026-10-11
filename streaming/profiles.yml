@@ -1,0 +1,7 @@
+online_retail_streaming:
+  target: local
+  outputs:
+    local:
+      type: duckdb
+      path: "{{ env_var('STREAMING_DB_PATH') }}"
+      threads: 1

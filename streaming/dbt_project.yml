@@ -1,0 +1,27 @@
+name: online_retail_streaming
+version: "1.0.0"
+config-version: 2
+profile: online_retail_streaming
+model-paths: [models]
+macro-paths: [macros]
+test-paths: [tests]
+clean-targets: [target, dbt_packages]
+
+vars:
+  source_path: "https://raw.githubusercontent.com/databricks/Spark-The-Definitive-Guide/master/data/retail-data/all/online-retail-dataset.csv"
+  date_format: "%m/%d/%Y %H:%M"
+  rows_per_chunk: 50
+  limit_rows: 0
+
+models:
+  online_retail_streaming:
+    +materialized: table
+    ingestion:
+      +schema: raw
+      +tags: [retail, ingestion]
+    staging:
+      +schema: staging
+      +tags: [retail, staging]
+    intermediate:
+      +schema: intermediate
+      +tags: [retail, intermediate]
