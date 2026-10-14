@@ -1,4 +1,4 @@
-{% set source_path = var("source_path") | replace("'", "''") %}
+{% set source_path = "https://raw.githubusercontent.com/databricks/Spark-The-Definitive-Guide/master/data/retail-data/all/online-retail-dataset.csv" %}
 {% set limit_rows = var("limit_rows", 0) | int %}
 
 with source_rows as (

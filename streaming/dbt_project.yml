@@ -6,9 +6,8 @@ model-paths: [models]
 macro-paths: [macros]
 test-paths: [tests]
 clean-targets: [target, dbt_packages]
-
 vars:
-  source_path: "https://raw.githubusercontent.com/databricks/Spark-The-Definitive-Guide/master/data/retail-data/all/online-retail-dataset.csv"
+  export_dir: '../exports/'
   date_format: "%m/%d/%Y %H:%M"
   rows_per_chunk: 50
   limit_rows: 0
@@ -25,3 +24,6 @@ models:
     intermediate:
       +schema: intermediate
       +tags: [retail, intermediate]
+    export:
+      +schema: export
+      +tags: [retail, export]

@@ -4,3 +4,16 @@ my_database.duckdb
 my_database.duckdb.wal
 uv.lock
 logs/
+streaming/source/online_retail.*
+streaming/source/online_retail_databricks.csv
+streaming/streaming.duckdb*
+streaming/stream_backlog/
+streaming/stream_input/
+streaming/stream_checkpoint/
+streaming/quarantine/
+streaming/.prepared.json
+streaming/.prep-*/
+streaming/__pycache__/
+streaming/target/
+streaming/dbt_packages/
+streaming/logs/

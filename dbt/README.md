@@ -169,3 +169,7 @@ From the dbt folder, use the project virtual environment to run
 Select a layer with `--select tag:intermediate`, or intersect selections with
 `--select tag:dvla,tag:marts`. Model tags also select attached tests through dbt's
 indirect selection.
+
+The local retail streaming practice uses an isolated dbt project under
+`../streaming/` and writes to `../streaming/streaming.duckdb`; it is not part of
+this vehicle pipeline or its normal `dbt run`.

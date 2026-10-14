@@ -3,5 +3,5 @@ online_retail_streaming:
   outputs:
     local:
       type: duckdb
-      path: "{{ env_var('STREAMING_DB_PATH') }}"
-      threads: 1
+      path: streaming.duckdb
+      threads: 8
