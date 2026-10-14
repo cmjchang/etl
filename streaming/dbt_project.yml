@@ -9,7 +9,7 @@ clean-targets: [target, dbt_packages]
 vars:
   export_dir: '../exports/'
   date_format: "%m/%d/%Y %H:%M"
-  rows_per_chunk: 50
+  rows_per_chunk: 10000
   limit_rows: 0
 
 models:

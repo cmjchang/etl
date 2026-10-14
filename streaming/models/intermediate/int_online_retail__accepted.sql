@@ -1,5 +1,3 @@
-{% set rows_per_chunk = var('rows_per_chunk', 50) | int %}
-
 with numbered as (
     select
         *,
@@ -7,9 +5,9 @@ with numbered as (
     from {{ ref('stg_online_retail__transactions') }}
     where rejection_reasons = ''
 )
+
 select
     source_row,
-    cast(floor(accepted_row / {{ rows_per_chunk }}) as bigint) as batch_id,
     invoice_no,
     stock_code,
     description,
