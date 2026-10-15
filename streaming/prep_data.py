@@ -231,11 +231,8 @@ def main() -> int:
                 if chunk_count:
                     connection.execute("SET threads = 1")
                     copy_sql = (
-                        'COPY (SELECT invoice_no AS "InvoiceNo", '
-                        'stock_code AS "StockCode", description AS "Description", '
-                        'quantity AS "Quantity", invoice_date AS "InvoiceDate", '
-                        'unit_price AS "UnitPrice", customer_id AS "CustomerID", '
-                        'country AS "Country", batch_id '
+                        "COPY (SELECT invoice_no, stock_code, description, quantity, "
+                        "invoice_date, unit_price, customer_id, country, batch_id "
                         "FROM intermediate.int_online_retail__accepted "
                         "ORDER BY batch_id, invoice_date, source_row) "
                         f"TO {_sql_string(str(partitioned_export))} "

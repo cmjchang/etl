@@ -101,7 +101,7 @@ class StreamingPracticeTests(unittest.TestCase):
                 chunks = sorted(backlog.glob("batch_*.parquet"))
                 with duckdb.connect() as connection:
                     ordered = connection.execute(
-                        "SELECT InvoiceNo FROM read_parquet(?) ORDER BY InvoiceDate, InvoiceNo",
+                        "SELECT invoice_no FROM read_parquet(?) ORDER BY invoice_date, invoice_no",
                         [[str(chunk) for chunk in chunks]],
                     ).fetchall()
                     schema = connection.execute(
@@ -109,7 +109,7 @@ class StreamingPracticeTests(unittest.TestCase):
                     ).fetchall()
                     chunk_ranges = [
                         connection.execute(
-                            "SELECT count(*), min(InvoiceDate), max(InvoiceDate) "
+                            "SELECT count(*), min(invoice_date), max(invoice_date) "
                             "FROM read_parquet(?)",
                             [str(chunk)],
                         ).fetchone()
@@ -117,8 +117,8 @@ class StreamingPracticeTests(unittest.TestCase):
                     ]
                 self.assertEqual([row[0] for row in ordered], ["1", "4", "3", "5"])
                 types = {row[0]: row[1] for row in schema}
-                self.assertEqual(types["Quantity"], "BIGINT")
-                self.assertEqual(types["UnitPrice"], "DECIMAL(18,4)")
+                self.assertEqual(types["quantity"], "BIGINT")
+                self.assertEqual(types["unit_price"], "DECIMAL(18,4)")
                 self.assertNotIn("batch_id", types)
                 self.assertEqual([chunk[0] for chunk in chunk_ranges], [2, 2])
                 self.assertLessEqual(chunk_ranges[0][2], chunk_ranges[1][1])

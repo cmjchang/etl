@@ -42,7 +42,10 @@ uv run python streaming/prep_data.py --limit-rows 500
 `stg_online_retail__transactions` performs typed validation. Intermediate models
 separate accepted/rejected rows and assign chronological batch IDs. dbt runs model
 tests before Python checks row-count reconciliation, writes rejected source rows
-to `quarantine/`, and exports typed Parquet chunks. The default chunk size is 50.
+to `quarantine/`, and exports typed Parquet chunks. The source CSV has PascalCase
+headers; the accepted Parquet schema and explicit Spark schema both use snake_case:
+`invoice_no`, `stock_code`, `description`, `quantity`, `invoice_date`, `unit_price`,
+`customer_id`, and `country`. The default chunk size is 50.
 
 To use a different raw CSV URL, dbt reads it directly; provide its DuckDB
 `strptime` date format:
@@ -113,7 +116,8 @@ The script refuses to overwrite nonempty runtime folders and never deletes data
 automatically. `--reset` allows replacing `.prepared.json`; the next run reads
 the URL again and rebuilds the dbt tables in `streaming.duckdb`.
 
-The two-hour watermark follows the maximum event timestamp observed, not feeder
+The two-hour watermark uses `invoice_date` event time and follows the maximum
+timestamp observed, not feeder
 wall-clock time. Chronological chunk ordering avoids advancing event time ahead
 of the historical records; if out-of-order chunks are introduced, sufficiently
 late events can be dropped from the aggregation state.

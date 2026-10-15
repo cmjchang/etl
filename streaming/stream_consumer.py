@@ -21,14 +21,14 @@ CHECKPOINT = ROOT / "stream_checkpoint"
 
 RETAIL_SCHEMA = StructType(
     [
-        StructField("InvoiceNo", StringType(), nullable=False),
-        StructField("StockCode", StringType(), nullable=False),
-        StructField("Description", StringType(), nullable=True),
-        StructField("Quantity", LongType(), nullable=False),
-        StructField("InvoiceDate", TimestampType(), nullable=False),
-        StructField("UnitPrice", DecimalType(18, 4), nullable=False),
-        StructField("CustomerID", StringType(), nullable=True),
-        StructField("Country", StringType(), nullable=False),
+        StructField("invoice_no", StringType(), nullable=False),
+        StructField("stock_code", StringType(), nullable=False),
+        StructField("description", StringType(), nullable=True),
+        StructField("quantity", LongType(), nullable=False),
+        StructField("invoice_date", TimestampType(), nullable=False),
+        StructField("unit_price", DecimalType(18, 4), nullable=False),
+        StructField("customer_id", StringType(), nullable=True),
+        StructField("country", StringType(), nullable=False),
     ]
 )
 
@@ -38,6 +38,8 @@ def main() -> None:
     CHECKPOINT.mkdir(parents=True, exist_ok=True)
     spark = (
         SparkSession.builder.appName("LocalOnlineRetailStreaming")
+        .config("spark.driver.bindAddress", "127.0.0.1")
+        .config("spark.driver.host", "127.0.0.1")
         .master("local[*]")
         .config("spark.sql.shuffle.partitions", "4")
         .config("spark.sql.session.timeZone", "Europe/London")
@@ -55,17 +57,17 @@ def main() -> None:
         )
 
         # Input filenames are published in chronological order. The watermark is
-        # based on InvoiceDate event time, not the feeder's wall-clock sleep; data
+        # based on invoice_date event time, not the feeder's wall-clock sleep; data
         # older than the active watermark can therefore be dropped from state.
         aggregate = (
-            source.withWatermark("InvoiceDate", "2 hours")
+            source.withWatermark("invoice_date", "2 hours")
             .groupBy(
-                window(col("InvoiceDate"), "10 minutes", "5 minutes"),
-                col("StockCode"),
+                window(col("invoice_date"), "10 minutes", "5 minutes"),
+                col("stock_code"),
             )
             .agg(
-                spark_sum(col("Quantity") * col("UnitPrice")).alias("total_revenue"),
-                spark_sum(col("Quantity")).alias("total_quantity"),
+                spark_sum(col("quantity") * col("unit_price")).alias("total_revenue"),
+                spark_sum(col("quantity")).alias("total_quantity"),
             )
         )
 
@@ -75,7 +77,7 @@ def main() -> None:
             .outputMode("update")
             .option("truncate", "false")
             .option("checkpointLocation", str(CHECKPOINT))
-            .trigger(processingTime="5 seconds")
+            .trigger(processingTime="1 seconds")
             .queryName("online_retail_window_aggregates")
             .start()
         )

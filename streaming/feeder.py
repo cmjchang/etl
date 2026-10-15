@@ -18,7 +18,7 @@ INPUT = ROOT / "stream_input"
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--min-delay", type=float, default=1.0)
+    parser.add_argument("--min-delay", type=float, default=5.0)
     parser.add_argument("--max-delay", type=float, default=5.0)
     parser.add_argument(
         "--seed", type=int, help="Set a repeatable delay sequence for practice."

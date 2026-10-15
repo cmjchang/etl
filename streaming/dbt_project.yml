@@ -7,9 +7,9 @@ macro-paths: [macros]
 test-paths: [tests]
 clean-targets: [target, dbt_packages]
 vars:
-  export_dir: '../exports/'
+  export_dir: 'stream_backlog/'
   date_format: "%m/%d/%Y %H:%M"
-  rows_per_chunk: 10000
+  rows_per_chunk: 250
   limit_rows: 0
 
 models:

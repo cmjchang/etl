@@ -6,6 +6,11 @@ The authoritative pipeline is ../dbt/run_pipeline.py, using ../my_database.duckd
 The fixed CSV in dbt/data was recovered from the existing raw database snapshot.
 The prior external duckdb folder was absent when this rename began.
 
+The local retail streaming practice is a separate DuckDB/dbt project in
+../streaming. Its models ingest the remote retail CSV, cast and classify records,
+and assign chronological chunk IDs in ../streaming/streaming.duckdb. The Python
+runner only coordinates dbt, reconciles counts, and writes Parquet delivery files.
+
 | Layer | Physical schema | Main models |
 |---|---|---|
 | Ingestion / sources | raw | raw_dvla__vehicle_registrations |

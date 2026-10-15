@@ -4,6 +4,11 @@ The dbt model graph uses ingestion/source -> staging -> intermediate -> core and
 reporting marts -> export. See [dbt documentation](dbt/README.md) and
 [DuckDB documentation](duckdb/README.md) for the existing transformation rules.
 
+The separate local retail streaming exercise has its own dbt project under
+`streaming/`, with raw, staging, and intermediate models in
+`streaming/dbt_project.yml`. It uses `streaming/streaming.duckdb` and does not
+participate in the vehicle pipeline.
+
 
 ## Per-model schema tests and tags — 7 October 2026
 
