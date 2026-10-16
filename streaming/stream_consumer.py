@@ -17,6 +17,7 @@ from pyspark.sql.types import (
 
 ROOT = Path(__file__).resolve().parent
 INPUT = ROOT / "stream_input"
+OUTPUT = ROOT / "stream_output"
 CHECKPOINT = ROOT / "stream_checkpoint"
 
 RETAIL_SCHEMA = StructType(
@@ -35,6 +36,7 @@ RETAIL_SCHEMA = StructType(
 
 def main() -> None:
     INPUT.mkdir(parents=True, exist_ok=True)
+    OUTPUT.mkdir(parents=True, exist_ok=True)
     CHECKPOINT.mkdir(parents=True, exist_ok=True)
     spark = (
         SparkSession.builder.appName("LocalOnlineRetailStreaming")
@@ -46,6 +48,11 @@ def main() -> None:
         .getOrCreate()
     )
     spark.sparkContext.setLogLevel("WARN")
+
+    def process_batch(batch_df, batch_id):
+        batch_df.persist()
+        batch_df.write.parquet(str(OUTPUT / f"batch_{batch_id}"))
+        batch_df.unpersist()
 
     try:
         source = (
@@ -73,9 +80,8 @@ def main() -> None:
 
         query = (
             # Reusing this checkpoint lets Spark remember files already consumed.
-            aggregate.writeStream.format("console")
-            .outputMode("update")
-            .option("truncate", "false")
+            aggregate.writeStream.outputMode("update")
+            .foreachBatch(process_batch)
             .option("checkpointLocation", str(CHECKPOINT))
             .trigger(processingTime="1 seconds")
             .queryName("online_retail_window_aggregates")
