@@ -1,0 +1,11 @@
+stream_input/*
+stream_output/*
+stream_backlog/*
+stream_checkpoint/*
+target/*
+quarantine/*
+logs/*
+__pycache__/*
+dbt_packages/*
+streaming.duckdb
+.DS_Store

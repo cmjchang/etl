@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: int_online_retail__rejected
+    description: Rows excluded from streaming output, retaining source values and SQL-generated rejection reasons.
+    columns:
+      - name: source_row
+        data_tests:
+          - not_null
+      - name: rejection_reasons
+        data_tests:
+          - not_null
