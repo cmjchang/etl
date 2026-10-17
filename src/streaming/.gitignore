@@ -9,3 +9,4 @@ __pycache__/*
 dbt_packages/*
 streaming.duckdb
 .DS_Store
+dbt_internal_packages/
