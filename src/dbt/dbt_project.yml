@@ -7,7 +7,7 @@ macro-paths: [macros]
 test-paths: [tests]
 clean-targets: [target, dbt_packages]
 vars:
-  export_dir: '../exports/'
+  export_dir: '../../exports/'
 models:
   vehicle_analytics:
     +materialized: table
