@@ -11,7 +11,7 @@ From the repository root, sync dependencies, then run dbt:
 
 ```sh
 uv sync
-cd dbt
+cd src/dbt
 dbt run
 ```
 
