@@ -24,21 +24,21 @@ jobs:
       - name: Check Out Repository
         uses: actions/checkout@v4
 
-      - name: Set Up Python
-        uses: actions/setup-python@v5
+      - name: Set Up uv and Python
+        uses: astral-sh/setup-uv@v6
         with:
           python-version: "3.12"
-          cache: pip
-          cache-dependency-path: src/dbt/requirements.txt
+          enable-cache: true
+          cache-dependency-glob: uv.lock
 
-      - name: Install Pinned Dependencies
-        run: python -m pip install -r src/dbt/requirements.txt
+      - name: Install Locked Dependencies
+        run: uv sync --locked
 
       - name: Test Pipeline Failure Gates
-        run: python -m unittest discover -s src/dbt/tests -p 'test_*.py' -v
+        run: uv run --locked python -m unittest discover -s src/dbt/tests -p 'test_*.py' -v
 
       - name: Build, Test, and Validate Sample Exports
-        run: python src/dbt/run_pipeline.py
+        run: uv run --locked python src/dbt/run_pipeline.py
 
       - name: Upload dbt Results and Exports
         if: always()
