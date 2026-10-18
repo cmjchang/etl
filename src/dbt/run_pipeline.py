@@ -10,21 +10,35 @@ import uuid
 import duckdb
 
 PROJECT = Path(__file__).resolve().parent
+ARTIFACTS = PROJECT.parents[1] / '.artifacts'
 NAMES = ['annual_model_registrations', 'annual_model_rankings', 'annual_best_models']
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--source', default=str(PROJECT / 'data/sample_vehicle_registrations.csv'))
+    parser.add_argument('--database', default=os.environ.get('VEHICLE_DB_PATH', str(ARTIFACTS / 'vehicle-demo.duckdb')))
     parser.add_argument('--export-root', default='')
     args = parser.parse_args()
-    os.chdir(PROJECT)
-    root = Path(args.export_root).resolve() if args.export_root else PROJECT.parent / 'exports'
+    source = args.source
+    if not source.startswith(('https://', 'http://')):
+        source = str(Path(source).expanduser().resolve(strict=True))
+    db = Path(args.database).expanduser().resolve()
+    db.parent.mkdir(parents=True, exist_ok=True)
+    environment = dict(os.environ, VEHICLE_DB_PATH=str(db))
+    root = Path(args.export_root).expanduser().resolve() if args.export_root else ARTIFACTS / 'exports'
     batch = root / (datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ') + '-' + uuid.uuid4().hex[:8])
-    dbt = PROJECT / '.venv/Scripts/dbt.exe'
-    subprocess.run([str(dbt), 'build', '--profiles-dir', '.', '--exclude', 'tag:export'], check=True)
+    variables = {'source_csv_path': source}
+    command = [sys.executable, '-m', 'dbt.cli.main', 'build', '--profiles-dir', str(PROJECT)]
+    subprocess.run(command + ['--exclude', 'tag:export', '--vars', json.dumps(variables),
+                   '--target-path', str(ARTIFACTS / 'dbt/build'),
+                   '--log-path', str(ARTIFACTS / 'logs/build')],
+                   cwd=PROJECT, env=environment, check=True)
     batch.mkdir(parents=True)
-    variables = json.dumps({'export_dir': batch.as_posix()})
-    subprocess.run([str(dbt), 'build', '--profiles-dir', '.', '--select', 'tag:export', '--vars', variables], check=True)
-    db = Path(os.environ.get('../my_database.duckdb')).resolve()
+    variables['export_dir'] = batch.as_posix()
+    subprocess.run(command + ['--select', 'tag:export', '--vars', json.dumps(variables),
+                   '--target-path', str(ARTIFACTS / 'dbt/exports'),
+                   '--log-path', str(ARTIFACTS / 'logs/exports')],
+                   cwd=PROJECT, env=environment, check=True)
     result = validate_exports(db, batch)
     manifest = {'database': str(db), 'batch': str(batch), 'validated_files': result}
     (batch / '_SUCCESS.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8')
@@ -51,7 +65,8 @@ def validate_exports(db, batch):
                             raise ValueError('Unexpected empty JSON')
                         result[path.name] = 0
                         continue
-                reader = f"read_{fmt}('{path.as_posix()}'" + (", header=true, all_varchar=true)" if fmt == 'csv' else ')')
+                escaped_path = path.as_posix().replace("'", "''")
+                reader = f"read_{fmt}('{escaped_path}'" + (", header=true, all_varchar=true)" if fmt == 'csv' else ')')
                 projection = ', '.join('cast("' + c[0] + '" as ' + c[1] + ') as "' + c[0] + '"' for c in columns)
                 con.execute('create or replace temp view export_check as select ' + projection + ' from ' + reader)
                 mismatch = con.sql('(select * from ' + relation + ' except all select * from export_check) union all (select * from export_check except all select * from ' + relation + ')').fetchone()

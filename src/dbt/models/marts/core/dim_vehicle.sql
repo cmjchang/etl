@@ -1,3 +1,5 @@
+{{ config(unique_key='vehicle_key') }}
+
 select distinct
     vehicle_key,
     body_type,

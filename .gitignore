@@ -1,7 +1,8 @@
 .venv/
-exports/
 my_database.duckdb
 my_database.duckdb.wal
 uv.lock
 logs/
 .DS_Store
+.artifacts/
+__pycache__/

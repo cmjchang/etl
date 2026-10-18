@@ -1,7 +1,8 @@
 .venv/
 target/
 logs/
-data/
+data/*
+!data/sample_vehicle_registrations.csv
 __pycache__/
 dbt_internal_packages/
 .user.yml
