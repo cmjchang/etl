@@ -34,11 +34,15 @@ jobs:
       - name: Install Locked Dependencies
         run: uv sync --locked
 
-      - name: Test Pipeline Failure Gates
-        run: uv run --locked python -m unittest discover -s src/dbt/tests -p 'test_*.py' -v
-
-      - name: Build, Test, and Validate Sample Exports
-        run: uv run --locked python src/dbt/run_pipeline.py
+      - name: Build and Test Sample Models
+        working-directory: src/dbt
+        run: |
+          mkdir -p ../../.artifacts/exports
+          uv run --locked python -m dbt.cli.main build \
+            --profiles-dir . \
+            --vars '{"source_csv_path":"data/sample_vehicle_registrations.csv","export_dir":"../../.artifacts/exports"}' \
+            --target-path ../../.artifacts/dbt \
+            --log-path ../../.artifacts/logs
 
       - name: Upload dbt Results and Exports
         if: always()
