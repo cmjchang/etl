@@ -1,0 +1,161 @@
+version: 2
+models:
+- name: dim_payment_type
+  description: TLC payment type codes (yellow and green taxi); HVFHV trips have no payment type.
+  config:
+    tags:
+    - nyc
+    - tlc
+    - marts
+  columns:
+  - name: payment_type_id
+    description: TLC payment type code.
+    data_tests:
+    - not_null
+    - unique
+  - name: payment_type
+    description: Payment type label.
+    data_tests:
+    - not_null
+  - name: tips_recorded
+    description: False when tips are not captured in the data (cash).
+    data_tests:
+    - not_null
+- name: fct_trip
+  description: One row per trip across yellow, green and HVFHV with common measures; HVFHV payment_type_id is null.
+  config:
+    tags:
+    - nyc
+    - tlc
+    - marts
+  columns:
+  - name: dataset
+    description: Source dataset (yellow, green, hvfhv).
+    data_tests:
+    - not_null
+    - accepted_values:
+        arguments:
+          values: [yellow, green, hvfhv]
+  - name: pickup_at
+    data_tests:
+    - not_null
+  - name: pickup_location_id
+    data_tests:
+    - relationships:
+        arguments:
+          to: ref('dim_taxi_zone')
+          field: location_id
+  - name: payment_type_id
+    data_tests:
+    - relationships:
+        arguments:
+          to: ref('dim_payment_type')
+          field: payment_type_id
+- name: dim_taxi_zone
+  description: One row per TLC taxi zone, keyed by location_id.
+  config:
+    tags:
+    - nyc
+    - tlc
+    - marts
+  columns:
+  - name: location_id
+    description: TLC Taxi Zone identifier; primary key referenced by the trip facts.
+    data_tests:
+    - not_null
+    - unique
+  - name: borough
+    description: Borough containing the taxi zone.
+    data_tests:
+    - not_null
+  - name: zone
+    description: Taxi zone name.
+    data_tests:
+    - not_null
+  - name: service_zone
+    description: TLC service zone classification for the taxi zone.
+    data_tests:
+    - not_null
+  data_tests:
+  - dvla_nonempty
+- name: fct_green_taxi_trip
+  description: One row per green taxi trip; load metadata removed.
+  config:
+    tags:
+    - nyc
+    - tlc
+    - green_taxi_trip
+    - marts
+  columns:
+  - name: pickup_location_id
+    description: Taxi zone where the trip started.
+    data_tests:
+    - not_null
+    - relationships:
+        arguments:
+          to: ref('dim_taxi_zone')
+          field: location_id
+  - name: dropoff_location_id
+    description: Taxi zone where the trip ended.
+    data_tests:
+    - not_null
+    - relationships:
+        arguments:
+          to: ref('dim_taxi_zone')
+          field: location_id
+  data_tests:
+  - dvla_nonempty
+- name: fct_yellow_taxi_trip
+  description: One row per yellow taxi trip; load metadata removed.
+  config:
+    tags:
+    - nyc
+    - tlc
+    - yellow_taxi_trip
+    - marts
+  columns:
+  - name: pickup_location_id
+    description: Taxi zone where the trip started.
+    data_tests:
+    - not_null
+    - relationships:
+        arguments:
+          to: ref('dim_taxi_zone')
+          field: location_id
+  - name: dropoff_location_id
+    description: Taxi zone where the trip ended.
+    data_tests:
+    - not_null
+    - relationships:
+        arguments:
+          to: ref('dim_taxi_zone')
+          field: location_id
+  data_tests:
+  - dvla_nonempty
+- name: fct_high_volume_for_hire_vehicle_trip
+  description: One row per high-volume for-hire vehicle trip; load metadata removed.
+  config:
+    tags:
+    - nyc
+    - tlc
+    - high_volume_for_hire_vehicle_trip
+    - marts
+  columns:
+  - name: pickup_location_id
+    description: Taxi zone where the trip started.
+    data_tests:
+    - not_null
+    - relationships:
+        arguments:
+          to: ref('dim_taxi_zone')
+          field: location_id
+  - name: dropoff_location_id
+    description: Taxi zone where the trip ended.
+    data_tests:
+    - not_null
+    - relationships:
+        arguments:
+          to: ref('dim_taxi_zone')
+          field: location_id
+  data_tests:
+  - dvla_nonempty

@@ -1,0 +1,67 @@
+version: 2
+models:
+- name: int_nyctlc__green_taxi_trip
+  description: Green taxi trips with location columns renamed to match the taxi zone lookup; all other raw columns unchanged.
+  config:
+    tags:
+    - nyc
+    - tlc
+    - green_taxi_trip
+    - intermediate
+  columns:
+  - name: pickup_location_id
+    description: TLC Taxi Zone where the trip started (raw PULocationID); joins to int_nyctlc__taxi_zone_lookup.location_id.
+    data_tests:
+    - not_null
+  - name: dropoff_location_id
+    description: TLC Taxi Zone where the trip ended (raw DOLocationID); joins to int_nyctlc__taxi_zone_lookup.location_id.
+    data_tests:
+    - not_null
+- name: int_nyctlc__yellow_taxi_trip
+  description: Yellow taxi trips with location columns renamed to match the taxi zone lookup; all other raw columns unchanged.
+  config:
+    tags:
+    - nyc
+    - tlc
+    - yellow_taxi_trip
+    - intermediate
+  columns:
+  - name: pickup_location_id
+    description: TLC Taxi Zone where the trip started (raw PULocationID); joins to int_nyctlc__taxi_zone_lookup.location_id.
+    data_tests:
+    - not_null
+  - name: dropoff_location_id
+    description: TLC Taxi Zone where the trip ended (raw DOLocationID); joins to int_nyctlc__taxi_zone_lookup.location_id.
+    data_tests:
+    - not_null
+- name: int_nyctlc__high_volume_for_hire_vehicle_trip
+  description: High-volume for-hire vehicle trips with location columns renamed to match the taxi zone lookup; all other raw columns unchanged.
+  config:
+    tags:
+    - nyc
+    - tlc
+    - high_volume_for_hire_vehicle_trip
+    - intermediate
+  columns:
+  - name: pickup_location_id
+    description: TLC Taxi Zone where the trip started (raw PULocationID); joins to int_nyctlc__taxi_zone_lookup.location_id.
+    data_tests:
+    - not_null
+  - name: dropoff_location_id
+    description: TLC Taxi Zone where the trip ended (raw DOLocationID); joins to int_nyctlc__taxi_zone_lookup.location_id.
+    data_tests:
+    - not_null
+- name: int_nyctlc__taxi_zone_lookup
+  description: Taxi zone lookup with LocationID renamed to location_id to match the trip models.
+  config:
+    tags:
+    - nyc
+    - tlc
+    - taxi_zone_lookup
+    - intermediate
+  columns:
+  - name: location_id
+    description: TLC Taxi Zone identifier; referenced by pickup_location_id and dropoff_location_id in the trip models.
+    data_tests:
+    - not_null
+    - unique

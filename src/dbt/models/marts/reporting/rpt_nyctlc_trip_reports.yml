@@ -1,0 +1,54 @@
+version: 2
+models:
+- name: rpt_nyctlc_trip_hourly
+  description: Trips and revenue by dataset, pickup date, pickup hour and payment type; base grain for the other NYC TLC reports.
+  config:
+    tags: [nyc, tlc, marts]
+  columns:
+  - name: dataset
+    data_tests: [not_null]
+  - name: pickup_date
+    data_tests: [not_null]
+  - name: pickup_hour
+    data_tests: [not_null]
+  - name: trip_count
+    data_tests: [not_null]
+- name: rpt_nyctlc_trip_volume
+  description: Trip counts per day, week, month and year by dataset.
+  config:
+    tags: [nyc, tlc, marts]
+  columns:
+  - name: period_type
+    data_tests:
+    - accepted_values:
+        arguments:
+          values: [day, week, month, year]
+  - name: period_start
+    data_tests: [not_null]
+  - name: dataset
+    data_tests: [not_null]
+- name: rpt_nyctlc_hourly_demand
+  description: Trips by dataset, day of week and hour of day, with average trips per calendar day.
+  config:
+    tags: [nyc, tlc, marts]
+  columns:
+  - name: day_of_week
+    data_tests: [not_null]
+  - name: pickup_hour
+    data_tests: [not_null]
+- name: rpt_nyctlc_monthly_revenue
+  description: Monthly fare, tip, tolls, surcharges and total by dataset, with average fare per trip and per mile and revenue share.
+  config:
+    tags: [nyc, tlc, marts]
+  columns:
+  - name: month_start
+    data_tests: [not_null]
+  - name: revenue_share
+    description: Dataset total_amount divided by all datasets' total_amount in the same month.
+- name: rpt_nyctlc_tip_by_payment_type
+  description: Tip percentage of fare by dataset and payment type; cash tips are not recorded.
+  config:
+    tags: [nyc, tlc, marts]
+  columns:
+  - name: payment_type
+    data_tests: [not_null]

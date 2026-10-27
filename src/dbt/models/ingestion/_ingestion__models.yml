@@ -1,0 +1,230 @@
+version: 2
+models:
+- name: raw_dvla__vehicle_registrations
+  description: DVLA remote CSV preserved as strings with source and load metadata.
+  config:
+    tags:
+    - dvla
+    - ingestion
+  columns:
+  - name: source_file
+    data_tests:
+    - not_null
+  - name: loaded_at
+    data_tests:
+    - not_null
+- name: raw_nyctlc__green_taxi_trip
+  description: NYC TLC green taxi monthly Parquet for 2025 plus January 2026 through nyctlc_end_month (default July). Source columns retain their TLC names and can vary by file; source and load metadata are appended.
+  config:
+    tags:
+    - nyc
+    - tlc
+    - green_taxi_trip
+    - ingestion
+  columns:
+  - name: VendorID
+    description: TLC identification number for the provider that supplied the record.
+  - name: lpep_pickup_datetime
+    description: Date and time the meter was engaged.
+  - name: lpep_dropoff_datetime
+    description: Date and time the meter was disengaged.
+  - name: store_and_fwd_flag
+    description: Indicates whether the trip record was held in vehicle memory before being sent to the vendor.
+  - name: RatecodeID
+    description: Final rate code in effect at the end of the trip.
+  - name: PULocationID
+    description: TLC Taxi Zone where the trip started.
+  - name: DOLocationID
+    description: TLC Taxi Zone where the trip ended.
+  - name: passenger_count
+    description: Driver-reported number of passengers.
+  - name: trip_distance
+    description: Trip distance reported by the taximeter, in miles.
+  - name: fare_amount
+    description: Time-and-distance fare calculated by the meter.
+  - name: extra
+    description: Miscellaneous extras and surcharges.
+  - name: mta_tax
+    description: MTA tax charged on the trip.
+  - name: tip_amount
+    description: Tip amount recorded by the meter; credit-card tips only.
+  - name: tolls_amount
+    description: Total tolls paid during the trip.
+  - name: ehail_fee
+    description: E-hail fee, when reported.
+  - name: improvement_surcharge
+    description: Improvement surcharge assessed on the trip.
+  - name: total_amount
+    description: Total amount charged to passengers, excluding cash tips.
+  - name: payment_type
+    description: Numeric code indicating how the passenger paid.
+  - name: trip_type
+    description: Numeric code indicating whether the trip was a street-hail or dispatch trip.
+  - name: congestion_surcharge
+    description: Congestion surcharge amount, when reported.
+  - name: cbd_congestion_fee
+    description: Central Business District congestion fee, when reported.
+  - name: request_source
+    description: Source from which the trip request originated, when reported.
+  - name: source_file
+    description: Path of the monthly Parquet file that supplied the record.
+    data_tests:
+    - not_null
+  - name: loaded_at
+    description: Timestamp when the record was loaded into the raw model.
+    data_tests:
+    - not_null
+- name: raw_nyctlc__high_volume_for_hire_vehicle_trip
+  description: NYC TLC high-volume for-hire vehicle monthly Parquet for 2025 plus January 2026 through nyctlc_end_month (default July). Source columns retain their TLC names and can vary by file; source and load metadata are appended.
+  config:
+    tags:
+    - nyc
+    - tlc
+    - high_volume_for_hire_vehicle_trip
+    - ingestion
+  columns:
+  - name: hvfhs_license_num
+    description: TLC license number of the high-volume for-hire vehicle base.
+  - name: dispatching_base_num
+    description: TLC base number that dispatched the trip.
+  - name: originating_base_num
+    description: TLC base number that received the trip request.
+  - name: request_datetime
+    description: Date and time the trip request was made.
+  - name: on_scene_datetime
+    description: Date and time the driver arrived at the pickup location.
+  - name: pickup_datetime
+    description: Date and time the passenger was picked up.
+  - name: dropoff_datetime
+    description: Date and time the passenger was dropped off.
+  - name: PULocationID
+    description: TLC Taxi Zone where the trip started.
+  - name: DOLocationID
+    description: TLC Taxi Zone where the trip ended.
+  - name: trip_miles
+    description: Trip distance in miles.
+  - name: trip_time
+    description: Trip duration in seconds.
+  - name: base_passenger_fare
+    description: Base fare charged to the passenger, excluding additional charges and fees.
+  - name: tolls
+    description: Tolls charged for the trip.
+  - name: bcf
+    description: Black car fund contribution.
+  - name: sales_tax
+    description: Sales tax charged for the trip.
+  - name: congestion_surcharge
+    description: Congestion surcharge amount, when reported.
+  - name: airport_fee
+    description: Airport fee amount, when reported.
+  - name: tips
+    description: Tips paid to the driver.
+  - name: driver_pay
+    description: Total driver pay for the trip, excluding tolls and tips.
+  - name: shared_request_flag
+    description: Indicates whether the passenger requested a shared trip.
+  - name: shared_match_flag
+    description: Indicates whether the trip was matched with another shared-trip passenger.
+  - name: access_a_ride_flag
+    description: Indicates whether the trip was recorded as an Access-A-Ride trip.
+  - name: wav_request_flag
+    description: Indicates whether a wheelchair-accessible vehicle was requested.
+  - name: wav_match_flag
+    description: Indicates whether the dispatched vehicle was wheelchair accessible.
+  - name: cbd_congestion_fee
+    description: Central Business District congestion fee, when reported.
+  - name: source_file
+    description: Path of the monthly Parquet file that supplied the record.
+    data_tests:
+    - not_null
+  - name: loaded_at
+    description: Timestamp when the record was loaded into the raw model.
+    data_tests:
+    - not_null
+- name: raw_nyctlc__yellow_taxi_trip
+  description: NYC TLC yellow taxi monthly Parquet for 2025 plus January 2026 through nyctlc_end_month (default July). Source columns retain their TLC names and can vary by file; source and load metadata are appended.
+  config:
+    tags:
+    - nyc
+    - tlc
+    - yellow_taxi_trip
+    - ingestion
+  columns:
+  - name: VendorID
+    description: TLC identification number for the provider that supplied the record.
+  - name: tpep_pickup_datetime
+    description: Date and time the meter was engaged.
+  - name: tpep_dropoff_datetime
+    description: Date and time the meter was disengaged.
+  - name: passenger_count
+    description: Driver-reported number of passengers.
+  - name: trip_distance
+    description: Trip distance reported by the taximeter, in miles.
+  - name: RatecodeID
+    description: Final rate code in effect at the end of the trip.
+  - name: store_and_fwd_flag
+    description: Indicates whether the trip record was held in vehicle memory before being sent to the vendor.
+  - name: PULocationID
+    description: TLC Taxi Zone where the trip started.
+  - name: DOLocationID
+    description: TLC Taxi Zone where the trip ended.
+  - name: payment_type
+    description: Numeric code indicating how the passenger paid.
+  - name: fare_amount
+    description: Time-and-distance fare calculated by the meter.
+  - name: extra
+    description: Miscellaneous extras and surcharges.
+  - name: mta_tax
+    description: MTA tax charged on the trip.
+  - name: tip_amount
+    description: Tip amount recorded by the meter; credit-card tips only.
+  - name: tolls_amount
+    description: Total tolls paid during the trip.
+  - name: improvement_surcharge
+    description: Improvement surcharge assessed on the trip.
+  - name: total_amount
+    description: Total amount charged to passengers, excluding cash tips.
+  - name: congestion_surcharge
+    description: Congestion surcharge amount, when reported.
+  - name: Airport_fee
+    description: Airport fee amount, when reported.
+  - name: cbd_congestion_fee
+    description: Central Business District congestion fee, when reported.
+  - name: request_source
+    description: Source from which the trip request originated, when reported.
+  - name: source_file
+    description: Path of the monthly Parquet file that supplied the record.
+    data_tests:
+    - not_null
+  - name: loaded_at
+    description: Timestamp when the record was loaded into the raw model.
+    data_tests:
+    - not_null
+- name: raw_nyctlc__taxi_zone_lookup
+  description: NYC TLC taxi zone lookup CSV mapping LocationID values to borough, zone, and service zone, with source and load metadata.
+  config:
+    tags:
+    - nyc
+    - tlc
+    - taxi_zone_lookup
+    - ingestion
+  columns:
+  - name: LocationID
+    description: TLC Taxi Zone identifier referenced by PULocationID and DOLocationID in the trip models.
+    data_tests:
+    - not_null
+    - unique
+  - name: Borough
+    description: Borough containing the taxi zone.
+  - name: Zone
+    description: Taxi zone name.
+  - name: service_zone
+    description: TLC service zone classification for the taxi zone.
+  - name: source_file
+    description: URL of the CSV that supplied the record.
+    data_tests:
+    - not_null
+  - name: loaded_at
+    description: Timestamp when the record was loaded into the raw model.
+    data_tests:
+    - not_null

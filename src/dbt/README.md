@@ -6,7 +6,7 @@ Updated: 6 October 2026.
 
 | Folder | Schema | Models / responsibility |
 |---|---|---|
-| models/ingestion | raw | raw_dvla__vehicle_registrations: fixed CSV ingestion |
+| models/ingestion | raw | raw_dvla__vehicle_registrations: CSV ingestion; raw_nyctlc__*: monthly taxi Parquet ingestion |
 | models/staging/dvla | staging | stg_dvla__vehicle_registrations: snake_case aliases, value preserving |
 | models/intermediate | intermediate | int_vehicle_registrations__unpivoted: null-preserving unpivot, cleaning and typing |
 | models/marts/core | core | dim_vehicle, dim_quarter, fct_vehicle_registrations |
@@ -68,6 +68,29 @@ Individual commands:
 ```
 
 ## General SQL logic and business rules
+
+### NYC TLC monthly ingestion
+
+The green taxi, high-volume for-hire vehicle (`fhvhv`), and yellow taxi models
+read all monthly Parquet files for 2025 plus January 2026 through
+`nyctlc_end_month`, inclusive (default: `7`, or July). Set this variable to an integer from 1 to 12
+to change the final month within 2026:
+
+```sh
+dbt build --profiles-dir . --select tag:tlc --vars '{"nyctlc_end_month": 7}'
+```
+
+Run from this dbt folder using the project's virtual environment. Each model
+combines the monthly files by column name, preserving native Parquet types.
+`source_file` identifies the actual input file for each row; `loaded_at` records
+the load timestamp. Missing or inaccessible files fail the build rather than
+being silently skipped. Only request months that have been published.
+
+The existing `source_csv_path` override is still supported: when provided, taxi
+models read that single path instead of the monthly range, and it must point to
+Parquet. Do not pass a DVLA CSV override when selecting taxi models.
+
+### DVLA transformations
 
 Staging aliases BodyType -> body_type, Make -> make, GenModel -> generic_model,
 Model -> model, Fuel -> fuel_type. Wide quarter columns become

@@ -8,11 +8,15 @@ test-paths: [tests]
 clean-targets: [target, dbt_packages]
 vars:
   export_dir: 'exports/'
+  nyctlc_end_month: 7
 models:
   vehicle_analytics:
     +materialized: table
     ingestion:
       +schema: raw
+      +materialized: incremental
+      +incremental_strategy: append
+      +on_schema_change: append_new_columns
     staging:
       +schema: staging
     intermediate:
